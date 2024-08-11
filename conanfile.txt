@@ -1,0 +1,12 @@
+[requires]
+openssl/3.3.1
+libyuv/1892
+ffmpeg/7.0.1
+opus/1.4
+libjpeg/9e
+libvpx/1.13.1
+openh264/2.3.1
+
+[generators]
+CMakeDeps
+CMakeToolchain

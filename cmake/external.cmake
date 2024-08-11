@@ -3,8 +3,7 @@ set(TG_OWT_OPENSSL_INCLUDE_PATH "" CACHE STRING "Include path for openssl.")
 function(link_openssl target_name)
     if (TG_OWT_PACKAGED_BUILD)
         find_package(OpenSSL REQUIRED)
-        target_include_directories(${target_name} SYSTEM PRIVATE ${OPENSSL_INCLUDE_DIR})
-        target_link_libraries(${target_name} PRIVATE ${OPENSSL_LIBRARIES})
+        target_link_libraries(${target_name} PRIVATE openssl::openssl)
     else()
         if (TG_OWT_OPENSSL_INCLUDE_PATH STREQUAL "")
             message(FATAL_ERROR "You should specify 'TG_OWT_OPENSSL_INCLUDE_PATH'.")
@@ -21,10 +20,8 @@ endfunction()
 set(TG_OWT_OPUS_INCLUDE_PATH "" CACHE STRING "Include path for opus.")
 function(link_opus target_name)
     if (TG_OWT_PACKAGED_BUILD)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(OPUS REQUIRED opus)
-        target_include_directories(${target_name} SYSTEM PRIVATE ${OPUS_INCLUDE_DIRS})
-        target_link_libraries(${target_name} PRIVATE ${OPUS_LINK_LIBRARIES})
+        find_package(Opus)
+        target_link_libraries(${target_name} PRIVATE Opus::opus)
     else()
         if (TG_OWT_OPUS_INCLUDE_PATH STREQUAL "")
             message(FATAL_ERROR "You should specify 'TG_OWT_OPUS_INCLUDE_PATH'.")
@@ -41,27 +38,15 @@ endfunction()
 set(TG_OWT_FFMPEG_INCLUDE_PATH "" CACHE STRING "Include path for ffmpeg.")
 function(link_ffmpeg target_name)
     if (TG_OWT_PACKAGED_BUILD)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(AVCODEC REQUIRED libavcodec)
-        pkg_check_modules(AVFORMAT REQUIRED libavformat)
-        pkg_check_modules(AVUTIL REQUIRED libavutil)
-        pkg_check_modules(SWSCALE REQUIRED libswscale)
-        pkg_check_modules(SWRESAMPLE REQUIRED libswresample)
-        target_include_directories(${target_name} SYSTEM
-        PRIVATE
-            ${AVCODEC_INCLUDE_DIRS}
-            ${AVFORMAT_INCLUDE_DIRS}
-            ${AVUTIL_INCLUDE_DIRS}
-            ${SWSCALE_INCLUDE_DIRS}
-            ${SWRESAMPLE_INCLUDE_DIRS}
-        )
+        find_package(ffmpeg REQUIRED)
+        # pkg_check_modules(AVCODEC REQUIRED libavcodec)
+        # pkg_check_modules(AVFORMAT REQUIRED libavformat)
+        # pkg_check_modules(AVUTIL REQUIRED libavutil)
+        # pkg_check_modules(SWSCALE REQUIRED libswscale)
+        # pkg_check_modules(SWRESAMPLE REQUIRED libswresample)
         target_link_libraries(${target_name}
-        PRIVATE
-            ${AVCODEC_LINK_LIBRARIES}
-            ${AVFORMAT_LINK_LIBRARIES}
-            ${AVUTIL_LINK_LIBRARIES}
-            ${SWSCALE_LINK_LIBRARIES}
-            ${SWRESAMPLE_LINK_LIBRARIES}
+            PRIVATE
+            ffmpeg::ffmpeg
         )
     else()
         if (TG_OWT_FFMPEG_INCLUDE_PATH STREQUAL "")
@@ -80,8 +65,7 @@ set(TG_OWT_LIBJPEG_INCLUDE_PATH "" CACHE STRING "Include path for libjpeg.")
 function(link_libjpeg target_name)
     if (TG_OWT_PACKAGED_BUILD)
         find_package(JPEG REQUIRED)
-        target_include_directories(${target_name} SYSTEM PRIVATE ${JPEG_INCLUDE_DIRS})
-        target_link_libraries(${target_name} PRIVATE ${JPEG_LIBRARIES})
+        target_link_libraries(${target_name} PRIVATE JPEG::JPEG)
     else()
         if (TG_OWT_LIBJPEG_INCLUDE_PATH STREQUAL "")
             message(FATAL_ERROR "You should specify 'TG_OWT_LIBJPEG_INCLUDE_PATH'.")
@@ -98,46 +82,41 @@ endfunction()
 # libabsl
 # HINT: System abseil should be built with -DCMAKE_CXX_STANDARD=20
 function(link_libabsl target_name)
-    if (TG_OWT_PACKAGED_BUILD)
-        find_package(absl)
-        set(absl_FOUND ${absl_FOUND} PARENT_SCOPE)
-        if (absl_FOUND)
-            target_link_libraries(${target_name}
-            PUBLIC
-                absl::algorithm_container
-                absl::bind_front
-                absl::config
-                absl::core_headers
-                absl::flat_hash_map
-                absl::inlined_vector
-                absl::flags
-                absl::flags_parse
-                absl::flags_usage
-                absl::memory
-                absl::optional
-                absl::strings
-                absl::synchronization
-                absl::type_traits
-                absl::variant
-            )
-        endif()
-    endif()
-    if (NOT absl_FOUND)
+    # if (TG_OWT_PACKAGED_BUILD)
+    #     find_package(absl)
+    #     set(absl_FOUND ${absl_FOUND} PARENT_SCOPE)
+    #     if (absl_FOUND)
+    #         target_link_libraries(${target_name}
+    #         PUBLIC
+    #             absl::algorithm_container
+    #             absl::bind_front
+    #             absl::config
+    #             absl::core_headers
+    #             absl::flat_hash_map
+    #             absl::inlined_vector
+    #             absl::flags
+    #             absl::flags_parse
+    #             absl::flags_usage
+    #             absl::memory
+    #             absl::optional
+    #             absl::strings
+    #             absl::synchronization
+    #             absl::type_traits
+    #             absl::variant
+    #         )
+    #     endif()
+    # endif()
+    # if (NOT absl_FOUND)
         target_link_libraries(${target_name} PRIVATE tg_owt::libabsl)
-    endif()
+    # endif()
 endfunction()
 
 # libopenh264
 set(TG_OWT_OPENH264_INCLUDE_PATH "" CACHE STRING "Include path for openh264.")
 function(link_libopenh264 target_name)
     if (TG_OWT_PACKAGED_BUILD)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(LIBOPENH264 openh264)
-        set(LIBOPENH264_FOUND ${LIBOPENH264_FOUND} PARENT_SCOPE)
-        if (LIBOPENH264_FOUND)
-            target_link_libraries(${target_name} PRIVATE ${LIBOPENH264_LINK_LIBRARIES})
-            target_include_directories(${target_name} SYSTEM PRIVATE ${LIBOPENH264_INCLUDE_DIRS})
-        endif()
+        find_package(openh264 REQUIRED)
+        target_link_libraries(${target_name} PRIVATE openh264::openh264)
     else()
         if (TG_OWT_OPENH264_INCLUDE_PATH STREQUAL "")
             message(FATAL_ERROR "You should specify 'TG_OWT_OPENH264_INCLUDE_PATH'.")
@@ -154,10 +133,8 @@ endfunction()
 set(TG_OWT_LIBVPX_INCLUDE_PATH "" CACHE STRING "Include path for libvpx.")
 function(link_libvpx target_name)
     if (TG_OWT_PACKAGED_BUILD)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(LIBVPX REQUIRED vpx>=1.10.0)
-        target_link_libraries(${target_name} PRIVATE ${LIBVPX_LINK_LIBRARIES})
-        target_include_directories(${target_name} SYSTEM PRIVATE ${LIBVPX_INCLUDE_DIRS})
+        find_package(libvpx REQUIRED)
+        target_link_libraries(${target_name} PRIVATE libvpx::libvpx)
     else()
         if (TG_OWT_LIBVPX_INCLUDE_PATH STREQUAL "")
             message(FATAL_ERROR "You should specify 'TG_OWT_LIBVPX_INCLUDE_PATH'.")
